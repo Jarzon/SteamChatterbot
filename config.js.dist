@@ -1,0 +1,4 @@
+module.exports = {
+    name: 'username', // Steam Username
+    password: '' // Steam Password
+};
