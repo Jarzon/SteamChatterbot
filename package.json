@@ -15,14 +15,13 @@
     "node": ">=4.0.0"
   },
   "bin": {
-    "sgbot" : "./bot.js"
+    "sgbot": "./bot.js"
   },
   "scripts": {
     "test": "mocha tests/"
   },
   "dependencies": {
-    "steamcommunity": "~3.34.",
-    "fast-levenshtein": "2.0.*"
+    "steamcommunity": "~3.24.0"
   },
   "devDependencies": {
     "chai": "3.5.*",
