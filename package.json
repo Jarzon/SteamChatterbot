@@ -1,0 +1,31 @@
+{
+  "name": "steambotty",
+  "version": "0.1.0",
+  "description": "",
+  "homepage": "https://github.com/jarzon/steambotty",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jarzon/steambotty.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jarzon/steambotty/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "bin": {
+    "sgbot" : "./bot.js"
+  },
+  "scripts": {
+    "test": "mocha tests/"
+  },
+  "dependencies": {
+    "steamcommunity": "~3.34.",
+    "fast-levenshtein": "2.0.*"
+  },
+  "devDependencies": {
+    "chai": "3.5.*",
+    "mocha": "3.2.*"
+  }
+}
