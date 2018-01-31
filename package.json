@@ -21,7 +21,8 @@
     "test": "mocha tests/"
   },
   "dependencies": {
-    "steam-user": "^3.24.0"
+    "steam-user": "^3.24.0",
+    "mysql": "^2.15.0"
   },
   "devDependencies": {
     "chai": "3.5.*",
