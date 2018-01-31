@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
     password : '',
-    database : 'my_db'
+    database : 'chatterbot'
 });
 
 connection.connect(function(err) {
@@ -41,9 +41,15 @@ client.on('error', function(e) {
 client.on('friendMessage', function(steamID, message) {
     console.log("Friend message from " + steamID.getSteam3RenderedID() + ": " + message);
 
+    if(message === '!quit' && steamID.getSteam3RenderedID() === '[U:1:51709674]') {
+        console.log('Okay thanks bye');
+        connection.end();
+        process.exit();
+    }
+
     let words = message.split(' ');
 
-    connection.query('SELECT t.sentence, t.sumWeight, t.totalConnections, t.totalWords\n' +
+    let query = 'SELECT t.sentence, t.sumWeight, t.totalConnections, t.totalWords\n' +
         '            FROM (\n' +
         '                SELECT BS.sentence, BC.sumWeight, COUNT(BCT.sentence_id) AS totalConnections, COUNT(BW.word_id) AS totalWords\n' +
         '                FROM (\n' +
@@ -54,7 +60,7 @@ client.on('friendMessage', function(steamID, message) {
         '                              SELECT BC.sentence_id, SUM(BC.weight) AS sumWeight\n' +
         '                              FROM bot_words BW\n' +
         '                                LEFT JOIN bot_connection BC ON BW.word_id = BC.word_id\n' +
-        '                              WHERE word IN (? '+ (',?'.repeat(words.count-1)) +')\n' +
+        '                              WHERE word IN (? '+ (',?'.repeat(words.length-1)) +')\n' +
         '                              GROUP BY BC.sentence_id\n' +
         '                            ) tt\n' +
         '                     GROUP BY tt.sentence_id\n' +
@@ -63,18 +69,27 @@ client.on('friendMessage', function(steamID, message) {
         '                 ) BC\n' +
         '                LEFT JOIN bot_sentence BS ON BS.sentence_id = BC.sentence_id\n' +
         '                LEFT JOIN bot_connection BCT ON BCT.sentence_id = BC.sentence_id\n' +
-        '                LEFT JOIN bot_words BW ON BW.word_id = BCT.word_id AND word IN (? '+ (',?'.repeat(words.count-1)) +')\n' +
+        '                LEFT JOIN bot_words BW ON BW.word_id = BCT.word_id AND word IN (? '+ (',?'.repeat(words.length-1)) +')\n' +
         '                GROUP BY BCT.sentence_id\n' +
         '                ORDER BY BC.sumWeight DESC\n' +
         '            ) t\n' +
         '            WHERE t.totalWords * (100 / t.totalConnections) > 50\n' +
         '            GROUP BY t.sentence\n' +
-        '            ORDER BY t.totalWords * (100 / t.totalConnections) DESC', words+words,
+        '            ORDER BY t.totalWords * (100 / t.totalConnections) DESC';
+
+    words = words.concat(words);
+
+    connection.query(query, words,
         function (error, results, fields) {
-            if (error) throw error;
-                client.chatMessage(steamID, results[0].solution);
+            if (error) {
+                console.log(error);
+                client.chatMessage(steamID, "huh");
+            }
+            else if(results.length > 0) {
+                client.chatMessage(steamID, results[0].sentence);
+            } else {
+                client.chatMessage(steamID, "huh");
+            }
         });
 
 });
-
-connection.end();
